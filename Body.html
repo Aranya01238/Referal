@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Referral System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enter Referral Code</h1>
+        <input type="text" id="referralCode" placeholder="Enter 8-digit code" maxlength="8">
+        <button onclick="applyReferral()">Submit</button>
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+        let doctors = [];
+
+// Fetch the doctors data from the server
+function fetchDoctorsData() {
+    fetch("http://localhost:3000/doctors")
+        .then(response => response.json())
+        .then(data => {
+            doctors = data;
+            console.log(doctors); // Optional: check the data format
+        })
+        .catch(error => {
+            console.error("Error fetching doctors data:", error);
+        });
+}
+
+// This function checks the referral code
+function applyReferral() {
+    const referralCode = document.getElementById("referralCode").value;
+    const messageElement = document.getElementById("message");
+    const doctor = doctors.find(doc => String(doc.ReferalID).trim() === String(referralCode).trim());
+
+
+    if (doctor) {
+        messageElement.style.color = "green";
+        messageElement.innerText = `Welcome, ${doctor.NAME}!`;
+        
+    } else {
+        messageElement.style.color = "red";
+        messageElement.innerText = "Invalid referral code. Please try again.";
+    }
+}
+
+// Fetch the doctors data when the page loads
+window.onload = fetchDoctorsData;
+        
+    </script>
+</body>
+</html>

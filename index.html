@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral Code Validation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div>
+        <h1>Enter Referral Code</h1>
+        <input type="file" id="fileInput" accept=".xlsx">
+        <input type="text" id="referralCode" placeholder="Enter Referral Code">
+        <button onclick="applyReferral()">Apply</button>
+        <p id="message" style="color: red;"></p>
+    </div>
+    <script>
+        let referralData = [];
+
+        // Function to read and parse the Excel file
+        document.getElementById("fileInput").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: "array" });
+                    const sheetName = workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+                    referralData = XLSX.utils.sheet_to_json(sheet); // Convert sheet to JSON
+                    alert("File loaded successfully!");
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                alert("Please upload a valid Excel file.");
+            }
+        });
+
+        // Function to apply referral code
+        function applyReferral() {
+            const referralCode = document.getElementById("referralCode").value;
+            const messageElement = document.getElementById("message");
+
+            if (referralData.length === 0) {
+                messageElement.style.color = "red";
+                messageElement.innerText = "No referral data loaded. Please upload an Excel file.";
+                return;
+            }
+
+            const doctor = referralData.find(row => row.ReferalID === referralCode);
+            if (doctor) {
+                messageElement.style.color = "green";
+                messageElement.innerText = `Welcome, ${doctor.NAME}!`;
+            } else {
+                messageElement.style.color = "red";
+                messageElement.innerText = "Invalid referral code. Please try again.";
+            }
+        }
+    </script>
+</body>
+</html>
